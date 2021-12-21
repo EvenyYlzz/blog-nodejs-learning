@@ -9,7 +9,7 @@ const getPostData = (req) => {
       resolve({})
       return
     }
-    if (req.headers['Content-Type'] !== 'application/json') {
+    if (req.headers['content-type'] !== 'application/json') {
       resolve({})
       return
     }
@@ -31,7 +31,6 @@ const getPostData = (req) => {
   })
   return promise
 }
-
 
 const serverHandle = (req, res) => {
   // 设置返回格式 JSON
