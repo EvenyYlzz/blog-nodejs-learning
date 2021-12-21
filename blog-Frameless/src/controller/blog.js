@@ -47,9 +47,16 @@ const updateBlog = (id, blogData = {}) => {
   return true
 }
 
+const delBlog = (id) => {
+  // id 被删除博客的id
+
+  return true
+}
+
 module.exports = {
   getList,
   getDetail,
   newBlog,
-  updateBlog
+  updateBlog,
+  delBlog
 }
