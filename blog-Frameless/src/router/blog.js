@@ -30,16 +30,28 @@ const handleBlogRouter = (req, res) => {
 
   // 获取博客详情
   if (method === 'GET' && req.path === '/api/blog/detail') {
-    const id = req.query.id
-    const detailData = getDetail(id)
+    // const detailData = getDetail(id)
+    // return new SuccessModel(detailData)
 
-    return new SuccessModel(detailData)
+    const result = getDetail(id)
+    return result.then(data => {
+      return new SuccessModel(data)
+    })
   }
 
   // 新建博客
   if (method === 'POST' && req.path === '/api/blog/new') {
-    const data = newBlog(req.body)
-    return new SuccessModel(data)
+    // const data = newBlog(req.body)
+    // return new SuccessModel(data)
+
+    // 暂时假数据
+    const author = 'zhangsan'
+    req.body.author = author
+
+    const result = newBlog(req.body)
+    return result.then(data => {
+      return new SuccessModel(data)
+    })
   }
 
   // 更新博客

@@ -16,23 +16,31 @@ const getList = (author, keyword) => {
 }
 
 const getDetail = (id) => {
-  // 先返回假数据
-  return {
-    id: 1,
-    title: '标题A',
-    content: '内容A',
-    createTime: 1639797208956,
-    author: 'zhangsan'
-  }
+  const sql = `select * from blogs where id='${id}'`
+  return exec(sql).then(rows => {
+    // 处理成对象
+    return rows[0]
+  })
 }
 
 const newBlog = (blogData = {}) => {
   // blogData 是一个博客对象，包含title、content属性
-  console.log('newBlog: blogData: ', blogData)
   
-  return {
-    id: 3   // 表示新建博客，插入到数据表里面的id（实际是一个自动生成的递增id）
-  }
+  // return {
+  //   id: 3   // 表示新建博客，插入到数据表里面的id（实际是一个自动生成的递增id）
+  // }
+  const title = blogData.title
+  const content = blogData.content
+  const author = blogData.author
+  const createTime = Date.now()
+  const sql = `
+    insert into blogs (title, content, createtime, author) values ('${title}', '${content}', ${createTime}, '${author}')
+  `
+  return exec(sql).then(insertData => {
+    return {
+      id: insertData.insertId
+    }
+  })
 }
 
 const updateBlog = (id, blogData = {}) => {
