@@ -87,6 +87,16 @@ const serverHandle = (req, res) => {
       return
     }
 
+    if (res.method == 'OPTIONS') {
+      response.writeHead(200, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With',
+        'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS'
+      });
+      response.end('');
+      return
+    }
+
     // 3.未命中路由返回404
     res.writeHead(404, {'Content-type': 'text/plain'})
     res.write('404 Not Found\n')
