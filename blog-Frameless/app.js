@@ -35,6 +35,9 @@ const getPostData = (req) => {
 const serverHandle = (req, res) => {
   // 设置返回格式 JSON
   res.setHeader('Content-Type', 'application/json')
+
+  // 思考：在这处理跨域其实是不对的，因为没判断请求的地址。
+  // 应该要判断请求的地址是否是我们自己项目的地址，否则就会导致所有网页请求我们的后端都允许跨域请求。这是不安全的。
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
   res.setHeader('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
@@ -87,13 +90,10 @@ const serverHandle = (req, res) => {
       return
     }
 
-    if (res.method == 'OPTIONS') {
-      response.writeHead(200, {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With',
-        'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS'
-      });
-      response.end('');
+    // 处理跨域的预检请求
+    if (req.method == 'OPTIONS') {
+      res.writeHead(200);
+      res.end('');
       return
     }
 
