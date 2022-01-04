@@ -14,21 +14,19 @@
 
 <script>
 import axios from 'axios'
+import { ref } from "vue"
+import { useStore } from "vuex"
 import { ElMessageBox, ElMessage } from 'element-plus'
 
 export default {
-  name: 'Login',
-  data() {
-    return {
-      username: '',
-      password: '',
-    }
-  },
-  mounted() {
-  },
-  methods: {
-    login() {
-      if (!this.username || !this.password) {
+  setup() {
+    const store = useStore()
+
+    const username = ref('')
+    const password = ref('')
+
+    const login = () => {
+      if (!username.value || !password.value) {
         ElMessage({
           message: '请将用户名或密码输入完成后再点击登录!',
           type: 'warning',
@@ -36,24 +34,77 @@ export default {
         return
       }
       axios.post('http://localhost:8000/api/user/login', {
-        username: this.username,
-        password: this.password,
+        username: username.value,
+        password: password.value,
       }, {
         headers: {
           'Content-Type': 'application/json'
         }
       }).then(json => {
         return json.data
-      }).then(res => {
-        this.loginResult(res)
+      }).then(resObj => {
+        loginResult(resObj)
+        if (resObj.errno === 0) {
+          store.commit('changeUsername', username.value)
+        }
       })
-    },
-    loginResult(resObj) {
+    }
+
+    const loginResult = (resObj) => {
       ElMessageBox.alert(`登录${resObj.errno === -1 ? '失败' : '成功'}`, '登录结果', {
         confirmButtonText: '确定',
         type: resObj.errno === -1 ? 'error' : 'success',
       })
     }
+
+    return {
+      username,
+      password,
+      login,
+      loginResult,
+      store,
+    }
   }
 }
+
+// export default {
+//   name: 'Login',
+//   data() {
+//     return {
+//       username: '',
+//       password: '',
+//     }
+//   },
+//   mounted() {
+//   },
+//   methods: {
+//     login() {
+//       if (!this.username || !this.password) {
+//         ElMessage({
+//           message: '请将用户名或密码输入完成后再点击登录!',
+//           type: 'warning',
+//         })
+//         return
+//       }
+//       axios.post('http://localhost:8000/api/user/login', {
+//         username: this.username,
+//         password: this.password,
+//       }, {
+//         headers: {
+//           'Content-Type': 'application/json'
+//         }
+//       }).then(json => {
+//         return json.data
+//       }).then(res => {
+//         this.loginResult(res)
+//       })
+//     },
+//     loginResult(resObj) {
+//       ElMessageBox.alert(`登录${resObj.errno === -1 ? '失败' : '成功'}`, '登录结果', {
+//         confirmButtonText: '确定',
+//         type: resObj.errno === -1 ? 'error' : 'success',
+//       })
+//     }
+//   }
+// }
 </script>

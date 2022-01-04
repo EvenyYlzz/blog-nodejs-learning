@@ -1,10 +1,27 @@
 <template>
   <div id="nav">
     <router-link to="/">Home</router-link>
+    <p>
+      {{store.state.username ? `登录用户: ${store.state.username}` : `未登录`}}
+    </p>
     <!-- <router-link to="/about">About</router-link> -->
     <router-view/>
   </div>
 </template>
+
+<script>
+import { useStore } from 'vuex'
+
+export default{
+  setup() {
+    const store = useStore()
+    return {
+      store,
+    }
+  },
+}
+</script>
+
 
 <style>
 #app {
