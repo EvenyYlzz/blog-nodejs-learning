@@ -45,8 +45,8 @@ const handleBlogRouter = (req, res) => {
     // return new SuccessModel(data)
 
     // 暂时假数据
-    const author = 'zhangsan'
-    req.body.author = author
+    // const author = 'zhangsan'
+    // req.body.author = author
 
     const result = newBlog(req.body)
     return result.then(data => {
