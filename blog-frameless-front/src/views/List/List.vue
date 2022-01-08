@@ -4,6 +4,14 @@
       <p>标题：{{data.title}}</p>
       <p>内容：{{data.content}}</p>
     </div> -->
+    <div style="position: absolute; right: 40px; top: 70px">
+      <el-button
+        size="default"
+        @click="handleNew"
+      >
+        新建博客
+      </el-button>
+    </div>
     <el-table
       stripe
       border
@@ -47,31 +55,47 @@
     <el-dialog
       v-model="dialogVisible"
       title="请编辑该条博客"
-      width="30%"
+      width="450px"
     >
-      <el-input
-        v-model="editTitle"
-        :rows="1"
-        type="textarea"
-        placeholder="请输入博客标题"
-      />
-      <el-input
+      <div style="display: flex">
+        <span>
+          标题：
+        </span>
+        <span>
+          <el-input
+            v-model="editTitle"
+            :rows="1"
+            type="textarea"
+            placeholder="请输入博客标题"
+            input-style="display: inline-block; width: 360px"
+          />
+        </span>
+      </div>
+      <div style="display: flex">
+      <span>
+        内容：
+      </span>
+      <span>
+        <el-input
         v-model="editContent"
         :rows="3"
         type="textarea"
         placeholder="请输入博客内容"
+        input-style="display: inline-block; width: 360px"
       />
-      <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="dialogVisible = false">取消</el-button>
-          <el-button
-            type="primary"
-            @click="sumBit"
-          >
-            提交
-          </el-button>
-        </span>
-      </template>
+      </span>
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button
+          type="primary"
+          @click="sumBit"
+        >
+          提交
+        </el-button>
+      </span>
+    </template>
     </el-dialog>
   </div>
 </template>
@@ -108,11 +132,45 @@ export default {
     const handleEdit = (index, row) => {
       editContent.value = row.content
       editTitle.value = row.title
-      dialogVisible.value = true
       editId.value = row.id
+      dialogVisible.value = true
     }
 
-    const sumBit = () => {
+    const handleNew = () => {
+      editContent.value = ''
+      editTitle.value = ''
+      editId.value = ''
+      dialogVisible.value = true
+    }
+
+    const newBlog = () => {
+      axios.post('http://localhost:8000/api/blog/new', {
+        title: editTitle.value,
+        content: editContent.value,
+        author: store.state.username,
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(json => {
+        return json.data
+      }).then(resObj => {
+        if (resObj.errno === 0) {
+          ElMessage({
+            message: '新建博客成功',
+            type: 'success',
+          })
+          getList()
+        } else {
+          ElMessage({
+            message: resObj.message,
+            type: 'warning',
+          })
+        }
+      })
+    }
+
+    const editBlog = () => {
       axios.post(`http://localhost:8000/api/blog/update?id=${editId.value}`, {
         title: editTitle.value,
         content: editContent.value,
@@ -136,10 +194,9 @@ export default {
           })
         }
       })
-      dialogVisible.value = false
     }
 
-    // 获取列表数据
+     // 获取列表数据
     const getList = () => {
       if (store.state.username) {
         let query = {
@@ -161,6 +218,15 @@ export default {
       }
     }
 
+    const sumBit = () => {
+      if (editId.value) {
+        editBlog()
+      } else {
+        newBlog()
+      }
+      dialogVisible.value = false
+    }
+
     onMounted(() => {
       getList()
     });
@@ -172,6 +238,7 @@ export default {
       editContent,
       sumBit,
       editTitle,
+      handleNew,
     }
   }
 }
