@@ -1,9 +1,5 @@
 <template>
   <div style="width: 100%">
-    <!-- <div v-for="(data, index) in blogList" :key="index">
-      <p>标题：{{data.title}}</p>
-      <p>内容：{{data.content}}</p>
-    </div> -->
     <div style="position: absolute; right: 40px; top: 70px">
       <el-button
         size="default"
@@ -18,6 +14,11 @@
       fit
       :data="blogList"
       style="width: 100%">
+      <el-table-column
+        prop="id"
+        label="博客ID"
+        width="90">
+      </el-table-column>
       <el-table-column
         prop="createtime"
         label="创建日期"
@@ -43,11 +44,21 @@
         width="180">
         <template #default="scope">
           <el-button
-            size="default"
+            type="primary"
             @click="handleEdit(scope.$index, scope.row)"
           >
             编辑
           </el-button>
+          <el-popconfirm
+            confirm-button-text="是"
+            cancel-button-text="否"
+            @confirm="handleDelete(scope.$index, scope.row)"
+            title="确认要删除该条博客吗？"
+          >
+            <template #reference>
+              <el-button type="danger">删除</el-button>
+            </template>
+          </el-popconfirm>
         </template>
       </el-table-column>
     </el-table>
@@ -105,6 +116,7 @@ import axios from 'axios'
 import {  ref } from 'vue'
 import { onMounted } from 'vue'
 import { useStore } from 'vuex'
+import { getHMS } from '../../utils/getHMS'
 import {  ElMessage } from 'element-plus'
 
 export default {
@@ -117,25 +129,7 @@ export default {
 
     const store = useStore()
 
-    const getHMS = (timestamp) => {
-      var date = new Date(timestamp); //时间戳为10位需*1000，时间戳为13位的话不需乘1000
-      var Y = date.getFullYear() + '/';
-      var M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '/';
-      var D = (date.getDate() < 10 ? '0' + (date.getDate()) : date.getDate()) + ' ';
-    
-      var h = (date.getHours() < 10 ? '0' + (date.getHours()) : date.getHours()) + ':';
-      var m = (date.getMinutes() < 10 ? '0' + (date.getMinutes()) : date.getMinutes()) + ':';
-      var s = (date.getSeconds() < 10 ? '0' + (date.getSeconds()) : date.getSeconds());
-      return Y + M + D + h + m + s;
-    }
-
-    const handleEdit = (index, row) => {
-      editContent.value = row.content
-      editTitle.value = row.title
-      editId.value = row.id
-      dialogVisible.value = true
-    }
-
+    // 点击新建打开
     const handleNew = () => {
       editContent.value = ''
       editTitle.value = ''
@@ -143,6 +137,20 @@ export default {
       dialogVisible.value = true
     }
 
+    // 点击编辑打开
+    const handleEdit = (index, row) => {
+      editContent.value = row.content
+      editTitle.value = row.title
+      editId.value = row.id
+      dialogVisible.value = true
+    }
+
+    // 点击删除
+    const handleDelete = (index, row) => {
+      deleteBlog(row.id)
+    }
+
+    // 新建博客接口提交
     const newBlog = () => {
       axios.post('http://localhost:8000/api/blog/new', {
         title: editTitle.value,
@@ -170,6 +178,7 @@ export default {
       })
     }
 
+    // 编辑博客接口提交
     const editBlog = () => {
       axios.post(`http://localhost:8000/api/blog/update?id=${editId.value}`, {
         title: editTitle.value,
@@ -184,6 +193,32 @@ export default {
         if (resObj.errno === 0) {
           ElMessage({
             message: '编辑更新成功',
+            type: 'success',
+          })
+          getList()
+        } else {
+          ElMessage({
+            message: resObj.message,
+            type: 'warning',
+          })
+        }
+      })
+    }
+
+    // 删除博客接口提交
+    const deleteBlog = (delId) => {
+      axios.post(`http://localhost:8000/api/blog/del?id=${delId}`, {
+        author: store.state.username,
+      }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(json => {
+        return json.data
+      }).then(resObj => {
+        if (resObj.errno === 0) {
+          ElMessage({
+            message: '删除成功',
             type: 'success',
           })
           getList()
@@ -218,6 +253,7 @@ export default {
       }
     }
 
+    // 提交新建或编辑的博客
     const sumBit = () => {
       if (editId.value) {
         editBlog()
@@ -233,12 +269,13 @@ export default {
 
     return {
       blogList,
-      handleEdit,
       dialogVisible,
-      editContent,
-      sumBit,
       editTitle,
+      editContent,
       handleNew,
+      handleEdit,
+      handleDelete,
+      sumBit,
     }
   }
 }

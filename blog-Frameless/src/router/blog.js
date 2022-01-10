@@ -69,9 +69,9 @@ const handleBlogRouter = (req, res) => {
   // 删除博客
   if (method === 'POST' && req.path === '/api/blog/del') {
     // 暂时假数据
-    const author = 'zhangsan'
-    req.body.author = author
-    const result = delBlog(id, author)
+    // const author = 'zhangsan'
+    // req.body.author = author
+    const result = delBlog(id, req.body.author)
     return result.then(val => {
       if (val) {
         return new SuccessModel()
