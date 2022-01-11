@@ -8,61 +8,11 @@
         新建博客
       </el-button>
     </div>
-    <el-table
-      stripe
-      border
-      fit
-      :data="blogList"
-      style="width: 100%">
-      <el-table-column
-        prop="id"
-        label="博客ID"
-        width="90">
-      </el-table-column>
-      <el-table-column
-        prop="createtime"
-        label="创建日期"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="author"
-        label="姓名"
-        width="100">
-      </el-table-column>
-      <el-table-column
-        prop="title"
-        label="标题"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="content"
-        label="内容"
-      >
-      </el-table-column>
-      <el-table-column
-        label="编辑"
-        width="180">
-        <template #default="scope">
-          <el-button
-            type="primary"
-            @click="handleEdit(scope.$index, scope.row)"
-          >
-            编辑
-          </el-button>
-          <el-popconfirm
-            confirm-button-text="是"
-            cancel-button-text="否"
-            @confirm="handleDelete(scope.$index, scope.row)"
-            title="确认要删除该条博客吗？"
-          >
-            <template #reference>
-              <el-button type="danger">删除</el-button>
-            </template>
-          </el-popconfirm>
-        </template>
-      </el-table-column>
-    </el-table>
-
+    <list-table
+      :blogList="blogList"
+      @edit="handleEdit"
+      @delete="handleDelete"
+    />
     <el-dialog
       v-model="dialogVisible"
       title="请编辑该条博客"
@@ -108,6 +58,12 @@
       </span>
     </template>
     </el-dialog>
+    <!-- <list-modal
+      :dialogVisible="dialogVisible"
+      :editTitle="editTitle"
+      :editContent="editContent"
+    /> -->
+
   </div>
 </template>
 
@@ -118,8 +74,14 @@ import { onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { getHMS } from '../../utils/getHMS'
 import {  ElMessage } from 'element-plus'
+import ListTable from './ListTable'
+// import ListModal from './ListModal'
 
 export default {
+  components: {
+    ListTable,
+    // ListModal
+  },
   setup() {
     const blogList = ref([])
     const dialogVisible = ref(false)
@@ -244,7 +206,8 @@ export default {
             blogList.value = res.data.map(n => {
               return {
                 ...n,
-                createtime: getHMS(n.createtime)
+                createtime: getHMS(n.createtime),
+                updatetime: getHMS(n.updatetime)
               }
             }
             )

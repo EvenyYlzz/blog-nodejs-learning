@@ -33,8 +33,9 @@ const newBlog = (blogData = {}) => {
   const content = blogData.content
   const author = blogData.author
   const createTime = Date.now()
+  const updateTime = Date.now()
   const sql = `
-    insert into blogs (title, content, createtime, author) values ('${title}', '${content}', ${createTime}, '${author}')
+    insert into blogs (title, content, createtime, author, updateTime) values ('${title}', '${content}', ${createTime}, '${author}', ${updateTime})
   `
   return exec(sql).then(insertData => {
     return {
@@ -50,9 +51,10 @@ const updateBlog = (id, blogData = {}) => {
 
   const title = blogData.title
   const content = blogData.content
+  const updateTime = Date.now()
 
   const sql = `
-    update blogs set title='${title}', content='${content}' where id=${id}
+    update blogs set title='${title}', content='${content}', updatetime=${updateTime} where id=${id}
   `
 
   return exec(sql).then(updateData => {

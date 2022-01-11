@@ -27,21 +27,4 @@ export default {
     }
   }
 }
-
-// export default {
-//   name: 'Home',
-//   components: {
-//     HelloWorld
-//   },
-//   mounted() {
-//     let query = {
-//       author: 'zhangsan',
-//     }
-//     axios.get(`http://localhost:8000/api/blog/list?query=${query.author}`).then(json => {
-//       return json.data
-//     }).then(res => {
-//       console.log('res', res)
-//     })
-//   }
-// }
 </script>
