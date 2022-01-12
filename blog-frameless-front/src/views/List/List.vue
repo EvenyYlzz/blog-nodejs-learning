@@ -13,7 +13,7 @@
       @edit="handleEdit"
       @delete="handleDelete"
     />
-    <!-- <el-dialog
+    <el-dialog
       v-model="dialogVisible"
       title="请编辑该条博客"
       width="450px"
@@ -57,16 +57,7 @@
         </el-button>
       </span>
     </template>
-    </el-dialog> -->
-    <list-modal
-      :dialogVisible="dialogVisible"
-      :editTitle="editTitle"
-      :editContent="editContent"
-      @cancel="dialogVisible = false"
-      @sumBit="sumBit"
-      @update:dialogVisible="dialogVisible = false"
-    />
-
+    </el-dialog>
   </div>
 </template>
 
@@ -78,12 +69,10 @@ import { useStore } from 'vuex'
 import { getHMS } from '../../utils/getHMS'
 import {  ElMessage } from 'element-plus'
 import ListTable from './ListTable'
-import ListModal from './ListModal'
 
 export default {
   components: {
     ListTable,
-    ListModal
   },
   setup() {
     const blogList = ref([])
