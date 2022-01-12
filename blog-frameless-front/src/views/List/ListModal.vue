@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="dialogVisible"
+    v-model="dialogShow"
     title="请编辑该条博客"
     width="450px"
   >
@@ -10,7 +10,7 @@
       </span>
       <span>
         <el-input
-          v-model="editTitle"
+          v-model="editTitle1"
           :rows="1"
           type="textarea"
           placeholder="请输入博客标题"
@@ -24,20 +24,22 @@
     </span>
     <span>
       <el-input
-      v-model="editContent"
-      :rows="3"
-      type="textarea"
-      placeholder="请输入博客内容"
-      input-style="display: inline-block; width: 360px"
-    />
+        v-model="editContent1"
+        :rows="3"
+        type="textarea"
+        placeholder="请输入博客内容"
+        input-style="display: inline-block; width: 360px"
+      />
     </span>
   </div>
   <template #footer>
     <span class="dialog-footer">
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <!-- @click="dialogVisible = false" -->
+      <el-button @click="$emit('cancel')">取消</el-button>
+      <!-- @click="sumBit" -->
       <el-button
         type="primary"
-        @click="sumBit"
+        @click="$emit('sumBit')"
       >
         提交
       </el-button>
@@ -47,6 +49,8 @@
 </template>
 
 <script>
+import { computed } from 'vue'
+
 export default {
   name: 'list-modal',
   props: {
@@ -54,6 +58,27 @@ export default {
     editTitle: String,
     editContent: String,
   },
+  data() {
+    return {
+      dialogVisible1: this.dialogVisible,
+      editTitle1: this.editTitle,
+      editContent1: this.editContent
+    }
+  },
+  setup() {
+    const dialogShow = computed({
+        get: () => this.dialogVisible,
+        set: val => $emit('update:dialogVisible', val)
+    })
+
+    return {
+      dialogShow
+    }
+  }
+  // updated() {
+  //   console.log('this.dialogVisible', this.dialogVisible)
+  //   console.log('dialogVisible1', this.dialogVisible1)
+  // }
 }
 </script>
 
