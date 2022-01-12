@@ -58,12 +58,6 @@
       </span>
     </template>
     </el-dialog>
-    <!-- <list-modal
-      :dialogVisible="dialogVisible"
-      :editTitle="editTitle"
-      :editContent="editContent"
-    /> -->
-
   </div>
 </template>
 
@@ -75,12 +69,10 @@ import { useStore } from 'vuex'
 import { getHMS } from '../../utils/getHMS'
 import {  ElMessage } from 'element-plus'
 import ListTable from './ListTable'
-// import ListModal from './ListModal'
 
 export default {
   components: {
     ListTable,
-    // ListModal
   },
   setup() {
     const blogList = ref([])
