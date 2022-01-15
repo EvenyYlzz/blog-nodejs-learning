@@ -38,9 +38,12 @@ const serverHandle = (req, res) => {
 
   // 思考：在这处理跨域其实是不对的，因为没判断请求的地址。
   // 应该要判断请求的地址是否是我们自己项目的地址，否则就会导致所有网页请求我们的后端都允许跨域请求。这是不安全的。
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild');
-  res.setHeader('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Credentials', 'true')
+  // 设置Access-Control-Allow-Credentials时,Access-Control-Allow-Origin需要设置为具体域名，不能用*
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8082')
+  // res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild')
+  res.setHeader('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS')
 
   // 获取path
   const url = req.url
@@ -48,6 +51,20 @@ const serverHandle = (req, res) => {
 
   // 解析query
   req.query = querystring.parse(url.split('?')[1])
+
+  // 解析cookie，将string处理成object赋值给req.cookie
+  req.cookie = {}
+  const cookieStr = req.headers.cookie || ''
+  cookieStr.split(';').forEach(item => {
+    if(!item){
+      return;
+    }
+    const arr = item.split('=')
+    // 前端频繁设置的cookie会自动拼接一个空格，需要去掉
+    const key = arr[0].trim()
+    const val = arr[1].trim()
+    req.cookie[key] = val
+  })
 
   // 处理postData
   getPostData(req).then(postData => {
