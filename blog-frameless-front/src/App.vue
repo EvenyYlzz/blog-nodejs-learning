@@ -10,11 +10,28 @@
 </template>
 
 <script>
+import { onMounted } from '@vue/runtime-core'
 import { useStore } from 'vuex'
+import axios from 'axios'
 
 export default{
   setup() {
     const store = useStore()
+
+    const loginCheck = () => {
+      axios.get('http://localhost:8000/api/user/login-test').then(json => {
+        return json.data
+      }).then(res => {
+        if (res.errno === 0) {
+          console.log('res', res)
+        }
+      })
+    }
+
+    onMounted(() => {
+      loginCheck()
+    })
+
     return {
       store,
     }
