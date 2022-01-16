@@ -106,7 +106,7 @@ export default {
 
     // 新建博客接口提交
     const newBlog = () => {
-      axios.post('http://localhost:8000/api/blog/new', {
+      axios.post('http://127.0.0.1:8000/api/blog/new', {
         title: editTitle.value,
         content: editContent.value,
         author: store.state.username,
@@ -134,7 +134,7 @@ export default {
 
     // 编辑博客接口提交
     const editBlog = () => {
-      axios.post(`http://localhost:8000/api/blog/update?id=${editId.value}`, {
+      axios.post(`http://127.0.0.1:8000/api/blog/update?id=${editId.value}`, {
         title: editTitle.value,
         content: editContent.value,
       }, {
@@ -161,7 +161,7 @@ export default {
 
     // 删除博客接口提交
     const deleteBlog = (delId) => {
-      axios.post(`http://localhost:8000/api/blog/del?id=${delId}`, {
+      axios.post(`http://127.0.0.1:8000/api/blog/del?id=${delId}`, {
         author: store.state.username,
       }, {
         headers: {
@@ -191,7 +191,7 @@ export default {
         let query = {
           author: store.state.username,
         }
-        axios.get(`http://localhost:8000/api/blog/list?author=${query.author}`).then(json => {
+        axios.get(`http://127.0.0.1:8000/api/blog/list?author=${query.author}`).then(json => {
           return json.data
         }).then(res => {
           if (res.errno === 0) {

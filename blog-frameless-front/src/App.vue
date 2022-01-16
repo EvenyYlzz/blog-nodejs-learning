@@ -19,7 +19,7 @@ export default{
     const store = useStore()
 
     const loginCheck = () => {
-      axios.get('http://localhost:8000/api/user/login-test').then(json => {
+      axios.get('http://127.0.0.1:8000/api/user/login-test').then(json => {
         return json.data
       }).then(res => {
         if (res.errno === 0) {
