@@ -34,7 +34,7 @@ export default {
         return
       }
       
-      axios.post('http://localhost:8000/api/user/login', {
+      axios.post('http://127.0.0.1:8000/api/user/login', {
         username: username.value,
         password: password.value,
       }, {
@@ -87,7 +87,7 @@ export default {
 //         })
 //         return
 //       }
-//       axios.post('http://localhost:8000/api/user/login', {
+//       axios.post('http://127.0.0.1:8000/api/user/login', {
 //         username: this.username,
 //         password: this.password,
 //       }, {

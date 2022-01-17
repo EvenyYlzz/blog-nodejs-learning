@@ -10,11 +10,34 @@
 </template>
 
 <script>
+import { onMounted } from '@vue/runtime-core'
 import { useStore } from 'vuex'
+import axios from 'axios'
+import { ElMessage } from 'element-plus'
 
 export default{
   setup() {
     const store = useStore()
+
+    const loginCheck = () => {
+      axios.get('http://127.0.0.1:8000/api/user/login-test').then(json => {
+        return json.data
+      }).then(res => {
+        if (res.errno === 0) {
+          store.commit('changeUsername', res.data.session.username)
+        } else {
+          ElMessage({
+            message: '请先登录再进行操作哦～',
+            type: 'warning',
+          })
+        }
+      })
+    }
+
+    onMounted(() => {
+      loginCheck()
+    })
+
     return {
       store,
     }

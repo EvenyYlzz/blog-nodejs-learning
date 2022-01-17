@@ -6,9 +6,10 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 
+axios.defaults.withCredentials = true
+
 createApp(App).use(store).use(router).use(ElementPlus).mount('#app')
 
-axios.defaults.withCredentials = true
 
 /*
   在axios中默认是不让后端写入cookie的

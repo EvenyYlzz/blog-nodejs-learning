@@ -5,7 +5,7 @@ let MYSQL_CONF
 
 if (env === 'dev') {
   MYSQL_CONF = {
-    host: 'localhost',
+    host: '127.0.0.1',
     user: 'root',
     password: '520yyl',
     port: '3306',
@@ -15,7 +15,7 @@ if (env === 'dev') {
 
 if (env === 'production') {
   MYSQL_CONF = {
-    host: 'localhost',
+    host: '127.0.0.1',
     user: 'root',
     password: '520yyl',
     port: '3306',
