@@ -13,6 +13,7 @@
 import { onMounted } from '@vue/runtime-core'
 import { useStore } from 'vuex'
 import axios from 'axios'
+import { ElMessage } from 'element-plus'
 
 export default{
   setup() {
@@ -23,7 +24,12 @@ export default{
         return json.data
       }).then(res => {
         if (res.errno === 0) {
-          console.log('res', res)
+          store.commit('changeUsername', res.data.session.username)
+        } else {
+          ElMessage({
+            message: '请先登录再进行操作哦～',
+            type: 'warning',
+          })
         }
       })
     }
