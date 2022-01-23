@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { onMounted } from '@vue/runtime-core'
+import { onMounted } from 'vue'
 import { useStore } from 'vuex'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
