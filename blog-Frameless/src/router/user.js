@@ -1,5 +1,5 @@
 const _ = require('lodash')
-
+const { get, set } = require('../db/redis')
 const { login } = require('../controller/user')
 
 const {
@@ -13,29 +13,54 @@ const getCookieExpires = () => {
   return d.toGMTString()
 }
 
-// 全局 session 数据
-const SESSION_DATA = {}
+// // 全局 session 数据
+// const SESSION_DATA = {}
 
 const handleUserRouter = (req, res) => {
   const method = req.method
 
-  // 初始值为false
+  // -----------------------------------------------------------------------
+  // session存放在进程中的内存
+
+  // // 初始值为false
+  // let needSetCookie = false
+  // // 从cookie中取出“加密”的userid
+  // let userId = req.cookie.userid
+  // if (userId) {
+  //   // 有userid但是没存取对应session时，给一个空对象
+  //   if (!SESSION_DATA[userId]) {
+  //     SESSION_DATA[userId] = {}
+  //   }
+  // } else {
+  //   // 如果没有cookie，则需要设置cookie
+  //   needSetCookie = true
+  //   userId = `${Date.now()}_${Math.random()}` // 此处模拟加密，反正就是不能直接明文告诉前端cookie存的是啥
+  //   SESSION_DATA[userId] = {}
+  // }
+  // // session 设置为全局数据中userid对应的value值
+  // req.session = _.cloneDeep(SESSION_DATA[userId])
+
+  // -----------------------------------------------------------------------
+  // 使用redis
+
   let needSetCookie = false
-  // 从cookie中取出“加密”的userid
   let userId = req.cookie.userid
   if (userId) {
-    // 有userid但是没存取对应session时，给一个空对象
-    if (!SESSION_DATA[userId]) {
-      SESSION_DATA[userId] = {}
-    }
+
   } else {
-    // 如果没有cookie，则需要设置cookie
     needSetCookie = true
-    userId = `${Date.now()}_${Math.random()}` // 此处模拟加密，反正就是不能直接明文告诉前端cookie存的是啥
-    SESSION_DATA[userId] = {}
+    userId = `${Date.now()}_${Math.random()}`
+    // 初始化redis  session
+    set(userId, {})
   }
-  // session 设置为全局数据中userid对应的value值
-  req.session = _.cloneDeep(SESSION_DATA[userId])
+
+  req.sessionId = userId
+  // 获取session
+  get(req.sessionId).then(sessionData => {
+    
+  })
+
+  // -----------------------------------------------------------------------
 
   // 登陆
   if (method === 'POST' && req.path === '/api/user/login') {
@@ -48,17 +73,21 @@ const handleUserRouter = (req, res) => {
         // 设置httpOnly禁止前端修改，设置之后前端通过document.cookie看不见
         // res.setHeader('Set-Cookie', `username=${username}; path=/; httpOnly; expires=${getCookieExpires()}`)
 
-        // 需要设置cookie，设置userid为前面“加密”生成的
-        if (needSetCookie) {
-          res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
-        }
-        // 设置session
-        req.session.username = data.username
-        req.session.realname = data.realname
+        // -----------------------------------------------------------------------
+        // session存放在进程中的内存
 
-        // 拿到值之后回存到全局数据
-        SESSION_DATA[userId] = req.session
+        // // 需要设置cookie，设置userid为前面“加密”生成的
+        // if (needSetCookie) {
+        //   res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
+        // }
+        // // 设置session
+        // req.session.username = data.username
+        // req.session.realname = data.realname
 
+        // // 拿到值之后回存到全局数据
+        // SESSION_DATA[userId] = req.session
+
+        // -----------------------------------------------------------------------
 
         return new SuccessModel()
       }
