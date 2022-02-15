@@ -45,19 +45,24 @@ const handleUserRouter = (req, res) => {
 
   let needSetCookie = false
   let userId = req.cookie.userid
-  if (userId) {
-
-  } else {
+  if (!userId) {
     needSetCookie = true
     userId = `${Date.now()}_${Math.random()}`
-    // 初始化redis  session
+    // 初始化redis中的session值
     set(userId, {})
   }
 
   req.sessionId = userId
   // 获取session
   get(req.sessionId).then(sessionData => {
-    
+    if (sessionData === null) {
+      // 初始化redis中的session值
+      set(req.sessionId, {})
+      // 设置session
+      req.session = {}
+    } else {
+      req.session = sessionData
+    }
   })
 
   // -----------------------------------------------------------------------
