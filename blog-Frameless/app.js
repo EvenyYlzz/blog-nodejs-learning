@@ -40,7 +40,7 @@ const serverHandle = (req, res) => {
   // 应该要判断请求的地址是否是我们自己项目的地址，否则就会导致所有网页请求我们的后端都允许跨域请求。这是不安全的。
   res.setHeader('Access-Control-Allow-Credentials', 'true')
   // 设置Access-Control-Allow-Credentials时,Access-Control-Allow-Origin需要设置为具体域名，不能用*
-  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:8082')
+  res.setHeader('Access-Control-Allow-Origin', 'http://127.0.0.1:8080')
   // res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild')
   res.setHeader('Access-Control-Allow-Methods', 'PUT, POST, GET, DELETE, OPTIONS')
