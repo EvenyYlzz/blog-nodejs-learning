@@ -42,7 +42,6 @@ const handleUserRouter = (req, res) => {
 
   // -----------------------------------------------------------------------
   // 使用redis
-
   let needSetCookie = false
   let userId = req.cookie.userid
   if (!userId) {
@@ -54,7 +53,7 @@ const handleUserRouter = (req, res) => {
 
   req.sessionId = userId
   // 获取session
-  get(req.sessionId).then(sessionData => {
+  return get(req.sessionId).then(sessionData => {
     if (sessionData === null) {
       // 初始化redis中的session值
       set(req.sessionId, {})
@@ -63,56 +62,66 @@ const handleUserRouter = (req, res) => {
     } else {
       req.session = sessionData
     }
-  })
+  }).then(() => {
+    // -----------------------------------------------------------------------
 
-  // -----------------------------------------------------------------------
+    // 登陆
+    if (method === 'POST' && req.path === '/api/user/login') {
+      const { username, password } = req.body
+      const result = login(username, password)
 
-  // 登陆
-  if (method === 'POST' && req.path === '/api/user/login') {
-    const { username, password } = req.body
-    const result = login(username, password)
+      return result.then(data => {
+        if (data.username) {
+          // 从服务端返回cookie到前端
+          // 设置httpOnly禁止前端修改，设置之后前端通过document.cookie看不见
+          // res.setHeader('Set-Cookie', `username=${username}; path=/; httpOnly; expires=${getCookieExpires()}`)
 
-    return result.then(data => {
-      if (data.username) {
-        // 从服务端返回cookie到前端
-        // 设置httpOnly禁止前端修改，设置之后前端通过document.cookie看不见
-        // res.setHeader('Set-Cookie', `username=${username}; path=/; httpOnly; expires=${getCookieExpires()}`)
+          // -----------------------------------------------------------------------
+          // session存放在进程中的内存
 
-        // -----------------------------------------------------------------------
-        // session存放在进程中的内存
+          // // 需要设置cookie，设置userid为前面“加密”生成的
+          // if (needSetCookie) {
+          //   res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
+          // }
+          // // 设置session
+          // req.session.username = data.username
+          // req.session.realname = data.realname
 
-        // // 需要设置cookie，设置userid为前面“加密”生成的
-        // if (needSetCookie) {
-        //   res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
-        // }
-        // // 设置session
-        // req.session.username = data.username
-        // req.session.realname = data.realname
+          // // 拿到值之后回存到全局数据
+          // SESSION_DATA[userId] = req.session
 
-        // // 拿到值之后回存到全局数据
-        // SESSION_DATA[userId] = req.session
+          // -----------------------------------------------------------------------
+          if (needSetCookie) {
+            res.setHeader('Set-Cookie', `userid=${userId}; path=/; httpOnly; expires=${getCookieExpires()}`)
+          }
+          // 设置session
+          req.session.username = data.username
+          req.session.realname = data.realname
+          // 同步到 redis
+          set(req.sessionId, req.session)
 
-        // -----------------------------------------------------------------------
 
-        return new SuccessModel()
+          return new SuccessModel()
+        }
+        return new ErrorModel('登陆失败')
+      })
+    }
+
+    // 登录验证的测试
+    if (method === 'GET' && req.path === '/api/user/login-test') {
+      if (req.session.username) {
+        return Promise.resolve(
+          new SuccessModel({
+            session: req.session
+          })
+        )
       }
-      return new ErrorModel('登陆失败')
-    })
-  }
-
-  // 登录验证的测试
-  if (method === 'GET' && req.path === '/api/user/login-test') {
-    if (req.session.username) {
       return Promise.resolve(
-        new SuccessModel({
-          session: req.session
-        })
+        new ErrorModel('尚未登录')
       )
     }
-    return Promise.resolve(
-      new ErrorModel('尚未登录')
-    )
-  }
+
+  })
 
 
   // 梳理session全过程
