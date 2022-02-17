@@ -6,9 +6,16 @@ const {
   delBlog
 } = require('../controller/blog')
 
-const {
-  SuccessModel, ErrorModel
-} = require('../model/resModel')
+const { SuccessModel, ErrorModel } = require('../model/resModel')
+
+// 统一的登录验证函数，课程中这样使用，但我个人觉得这种做法不如我自己的做法，所以这一节注释掉
+// const loginCheck = (req) => {
+//   if (!req.session.username) {
+//     return Promise.resolve(
+//       new ErrorModel('尚未登录')
+//     )
+//   }
+// }
 
 const handleBlogRouter = (req, res) => {
   const method = req.method
@@ -33,6 +40,12 @@ const handleBlogRouter = (req, res) => {
     // const detailData = getDetail(id)
     // return new SuccessModel(detailData)
 
+    const loginCheckResult = loginCheck(req)
+    if (loginCheckResult) {
+      // 有值就是未登录
+      return loginCheck
+    }
+
     const result = getDetail(id)
     return result.then(data => {
       return new SuccessModel(data)
@@ -48,6 +61,15 @@ const handleBlogRouter = (req, res) => {
     // const author = 'zhangsan'
     // req.body.author = author
 
+    // const loginCheckResult = loginCheck(req)
+    // if (loginCheckResult) {
+    //   // 有值就是未登录
+    //   return loginCheck
+    // }
+
+    // 此时前端可以不传username，从session拿
+    // req.body.author = req.session.username
+
     const result = newBlog(req.body)
     return result.then(data => {
       return new SuccessModel(data)
@@ -56,6 +78,13 @@ const handleBlogRouter = (req, res) => {
 
   // 更新博客
   if (method === 'POST' && req.path === '/api/blog/update') {
+
+    // const loginCheckResult = loginCheck(req)
+    // if (loginCheckResult) {
+    //   // 有值就是未登录
+    //   return loginCheck
+    // }
+
     const result = updateBlog(id, req.body)
     return result.then(val => {
       if (val) {
@@ -71,6 +100,13 @@ const handleBlogRouter = (req, res) => {
     // 暂时假数据
     // const author = 'zhangsan'
     // req.body.author = author
+
+    // const loginCheckResult = loginCheck(req)
+    // if (loginCheckResult) {
+    //   // 有值就是未登录
+    //   return loginCheck
+    // }
+
     const result = delBlog(id, req.body.author)
     return result.then(val => {
       if (val) {
